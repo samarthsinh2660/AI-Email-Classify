@@ -14,10 +14,17 @@ import logger from '../utils/logger';
  */
 export const getAuthUrl = async (req: Request,res: Response,next: NextFunction): Promise<void> => {
   try {
+    const host = req.get('host');
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? `https://${host}`
+      : `http://${host}`;
+
+    const redirectUri = `${baseUrl}/api/auth/google/callback`;
+
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
+      redirectUri
     );
 
     const scopes = [
@@ -51,10 +58,18 @@ export const handleCallback = async (req: Request,res: Response,next: NextFuncti
       throw ERRORS.INVALID_OAUTH_CODE;
     }
 
+    // Use dynamic redirect URI based on request host
+    const host = req.get('host');
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? `https://${host}`
+      : `http://${host}`;
+
+    const redirectUri = `${baseUrl}/api/auth/google/callback`;
+
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
+      redirectUri
     );
 
     // Exchange code for tokens
@@ -108,10 +123,18 @@ export const refreshToken = async (req: Request,res: Response,next: NextFunction
       throw ERRORS.INVALID_REFRESH_TOKEN;
     }
 
+    // Use dynamic redirect URI based on request host
+    const host = req.get('host');
+    const baseUrl = process.env.NODE_ENV === 'production'
+      ? `https://${host}`
+      : `http://${host}`;
+
+    const redirectUri = `${baseUrl}/api/auth/google/callback`;
+
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
+      redirectUri
     );
 
     oauth2Client.setCredentials({
