@@ -26,6 +26,10 @@ dotenv.config();
 
 // Create Express app
 const app: Application = express();
+
+// Trust proxy for rate limiting (important for deployment behind reverse proxies)
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 5000;
 
 /**
